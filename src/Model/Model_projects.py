@@ -2,8 +2,6 @@ from src.Utils.DB_conect import get_db_connection
 import psycopg2.extras
 
 
-
-
 def fetch_all_projects():
     with get_db_connection() as conn:
         cur = conn.cursor( cursor_factory=psycopg2.extras.DictCursor)
