@@ -6,35 +6,34 @@ def fetch_all_customer_requests():
     with get_db_connection() as conn:
         cur = conn.cursor( cursor_factory=psycopg2.extras.DictCursor)
         cur.execute("""SELECT
-            customer_requests.id,
-            customer_requests.name,
-            customer_requests.phone,
-            customer_requests.email,
-            customer_requests.category,
-            customer_requests.message,
-            customer_requests.created_at
-            FROM dor_lawyer_portfolio.customer_requests
+            customer_request.id,
+            customer_request.name,
+            customer_request.phone,
+            customer_request.email,
+            customer_request.category,
+            customer_request.message,
+            customer_request.created_at
+            FROM dor_lawyer_portfolio.customer_request
             """)
-        customer_requests = cur.fetchall()
-        return (customer_requests)
+        requests = cur.fetchall()
+        return (requests)
     
     
 
-def fetch_customer_request_by_date(from_date: date):
+def fetch_customer_requests_by_date(from_date: date):
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
-            cur.execute("""
-                SELECT
-                    customer_requests.id,
-                    customer_requests.name,
-                    customer_requests.phone,
-                    customer_requests.email,
-                    customer_requests.category,
-                    customer_requests.message,
-                    customer_requests.created_at
-                FROM dor_lawyer_portfolio.customer_requests
-                WHERE customer_requests.created_at >= %s
-                ORDER BY customer_requests.created_at DESC
+            cur.execute("""SELECT
+                    customer_request.id,
+                    customer_request.name,
+                    customer_request.phone,
+                    customer_request.email,
+                    customer_request.category,
+                    customer_request.message,
+                    customer_request.created_at
+                FROM dor_lawyer_portfolio.customer_request
+                WHERE customer_request.created_at >= %s
+                ORDER BY customer_request.created_at DESC
             """, (from_date,))
         requests = cur.fetchall()
         return (requests)
@@ -50,7 +49,7 @@ def add_new_customer_request(name: str,
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO dor_lawyer_portfolio.customer_requests
+            INSERT INTO dor_lawyer_portfolio.customer_request
             (name, phone, email, category, message)
             VALUES (%s, %s, %s, %s, %s)
             RETURNING id
