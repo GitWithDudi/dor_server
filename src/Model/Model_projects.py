@@ -39,8 +39,9 @@ def fetch_project_by_category_id(category_id: int):
     
 def add_new_project(project_name: str,
                     description: str,
-                    image:str,
-                    category_id: int):
+                    category_id: int,
+                    image: str | None = None
+                    ):
     with get_db_connection() as conn:
         cur = conn.cursor()
         cur.execute("""
