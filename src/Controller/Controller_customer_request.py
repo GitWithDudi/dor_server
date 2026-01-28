@@ -18,6 +18,7 @@ def get_all_customer_requests():
                 "email": req["email"],
                 "category": req["category"],
                 "message": req["message"],
+                "status": req["status"],
                 "created_at": req["created_at"].isoformat() if req["created_at"] else None
             })
         return jsonify(result), 200
@@ -52,6 +53,7 @@ def get_customer_requests_by_date(from_date):
                 "email": req["email"],
                 "category": req["category"],
                 "message": req["message"],
+                "status": req["status"],
                 "created_at": req["created_at"].isoformat() if req["created_at"] else None
             })
         return jsonify(result), 200
