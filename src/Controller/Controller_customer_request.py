@@ -1,64 +1,97 @@
 from src.Model.Model_customer_request import (fetch_all_customer_requests, fetch_customer_requests_by_date, add_new_customer_request)
 from datetime import date, datetime
-from flask import Request, jsonify
+from flask import request, jsonify
 import validators
 
 
 
-def get_all_customer_requests(token):
-    if not token:
-        raise PermissionError("Missing authentication token")
+def get_all_customer_requests():
+    try:
+        requests = fetch_all_customer_requests()
 
-    requests = fetch_all_customer_requests(token)
-    return requests
+        result = []
+        for req in requests:
+            result.append({
+                "id": req["id"],
+                "name": req["name"],
+                "phone": req["phone"],
+                "email": req["email"],
+                "category": req["category"],
+                "message": req["message"],
+                "created_at": req["created_at"].isoformat() if req["created_at"] else None
+            })
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-def get_customer_requests_by_date(token, from_date):
-    if not token:
-        raise PermissionError("Missing authentication token")
-
+def get_customer_requests_by_date(from_date):
     if from_date is None:
-        raise ValueError("from_date parameter is required")
+        return jsonify({"error": "from_date parameter is required"}), 400
 
     if isinstance(from_date, str):
         try:
             from_date = datetime.strptime(from_date, "%d-%m-%Y").date()
         except ValueError:
-            raise ValueError("from_date must be in DD-MM-YYYY format")
+            return jsonify({"error": "from_date must be in DD-MM-YYYY format"}), 400
     elif not isinstance(from_date, date):
-        raise TypeError("from_date must be a string in DD-MM-YYYY format")
+        return jsonify({"error": "from_date must be a string in DD-MM-YYYY format"}), 400
 
     if from_date > date.today():
-        raise ValueError("from_date cannot be in the future")
+        return jsonify({"error": "from_date cannot be in the future"}), 400
 
-    return fetch_customer_requests_by_date(token, from_date)
+    try:
+        requests = fetch_customer_requests_by_date(from_date)
+
+        result = []
+        for req in requests:
+            result.append({
+                "id": req["id"],
+                "name": req["name"],
+                "phone": req["phone"],
+                "email": req["email"],
+                "category": req["category"],
+                "message": req["message"],
+                "created_at": req["created_at"].isoformat() if req["created_at"] else None
+            })
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 def create_customer_request():
-    data = Request.get_json()
-    
-    name = data.get("name")
-    phone = data.get("phone")
-    email = data.get("email")
-    message = data.get("message")
-    category = data.get("category")
-
-    if not name or not phone or not email or not message:
-        raise ValueError("Name, phone, email, and message are required fields")
-    if not validators.email(email):
-        raise ValueError("Invalid email format")
-    if not phone.isdigit() or len(phone) < 7:
-        raise ValueError("Invalid phone number format")
-
     try:
-        add_new_customer_request(
-            name=name,
-            phone=phone,
-            email=email,
-            message=message,
-            category=category
-        )
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        name = data.get("name")
+        phone = data.get("phone")
+        email = data.get("email")
+        message = data.get("message")
+        category = data.get("category")
+
+        if not name or not phone or not email or not message:
+            return jsonify({"error": "Name, phone, email, and message are required fields"}), 400
+
+        if not validators.email(email):
+            return jsonify({"error": "Invalid email format"}), 400
+
+        if not phone.isdigit() or len(phone) < 7:
+            return jsonify({"error": "Invalid phone number format"}), 400
+
+        try:
+            new_request_id = add_new_customer_request(
+                name=name,
+                phone=phone,
+                email=email,
+                message=message,
+                category=category
+            )
+            return jsonify({"message": "Customer request created successfully", "request_id": new_request_id}), 201
+        except Exception as e:
+            return jsonify({"error": f"Failed to create customer request: {str(e)}"}), 500
+
     except Exception as e:
-        raise RuntimeError(f"Failed to create customer request: {e}")           
-    return jsonify({"message": "Customer request created successfully"}), 201
-    
+        return jsonify({"error": str(e)}), 500

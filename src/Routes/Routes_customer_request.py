@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-from dor_server.src.Controller.Controller_customer_request import get_all_customer_requests, get_customer_requests_by_date, create_customer_request
+from src.Controller.Controller_customer_request import get_all_customer_requests, get_customer_requests_by_date, create_customer_request
 
 customer_request_bp = Blueprint('customer_request', __name__)
 

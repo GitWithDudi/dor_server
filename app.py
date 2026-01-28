@@ -3,11 +3,16 @@ from src.Routes.Routes_customer_request import customer_request_bp
 from src.Routes.Route_login import login_bp
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+from dotenv import load_dotenv
+import os
 
-
-
+load_dotenv()
 
 app = Flask(__name__)
+
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+jwt = JWTManager(app)
 
     
 
