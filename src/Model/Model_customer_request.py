@@ -12,6 +12,7 @@ def fetch_all_customer_requests():
             customer_request.email,
             customer_request.category,
             customer_request.message,
+            customer_request.status,
             customer_request.created_at
             FROM dor_lawyer_portfolio.customer_request
             """)
@@ -30,6 +31,7 @@ def fetch_customer_requests_by_date(from_date: date):
                     customer_request.email,
                     customer_request.category,
                     customer_request.message,
+                    customer_request.status,
                     customer_request.created_at
                 FROM dor_lawyer_portfolio.customer_request
                 WHERE customer_request.created_at >= %s
