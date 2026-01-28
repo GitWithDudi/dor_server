@@ -59,3 +59,19 @@ def add_new_customer_request(name: str,
         new_request_id: int = cur.fetchone()[0]
         conn.commit()
         return new_request_id
+
+
+def update_customer_request_status(request_id: int, new_status: str):
+    with get_db_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE dor_lawyer_portfolio.customer_request
+            SET status = %s
+            WHERE id = %s
+            RETURNING id
+        """, (new_status, request_id))
+        result = cur.fetchone()
+        if not result:
+            return None
+        conn.commit()
+        return result[0]
