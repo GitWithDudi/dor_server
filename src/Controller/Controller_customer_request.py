@@ -97,3 +97,37 @@ def create_customer_request():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+def update_request_status(request_id):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        new_status = data.get("status")
+
+        if not new_status:
+            return jsonify({"error": "Status is required"}), 400
+
+        # Validate status value
+        valid_statuses = ['pending', 'in_progress', 'completed', 'closed']
+        if new_status not in valid_statuses:
+            return jsonify({"error": f"Invalid status. Must be one of: {', '.join(valid_statuses)}"}), 400
+
+        # Validate request_id is integer
+        try:
+            request_id = int(request_id)
+        except (TypeError, ValueError):
+            return jsonify({"error": "Invalid request ID"}), 400
+
+        updated_id = update_customer_request_status(request_id, new_status)
+
+        if updated_id is None:
+            return jsonify({"error": "Customer request not found"}), 404
+
+        return jsonify({"message": "Status updated successfully", "request_id": updated_id}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
