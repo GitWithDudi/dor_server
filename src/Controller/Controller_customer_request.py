@@ -1,4 +1,4 @@
-from src.Model.Model_customer_request import (fetch_all_customer_requests, fetch_customer_requests_by_date, add_new_customer_request)
+from src.Model.Model_customer_request import (fetch_all_customer_requests, fetch_customer_requests_by_date, add_new_customer_request, update_customer_request_status)
 from datetime import date, datetime
 from flask import request, jsonify
 import validators
